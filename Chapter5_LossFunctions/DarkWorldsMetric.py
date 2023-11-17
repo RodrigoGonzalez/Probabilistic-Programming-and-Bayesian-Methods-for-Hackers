@@ -19,7 +19,7 @@ import argparse as ap
 import string as st
 import random as rd
 
-def calc_delta_r(x_predicted,y_predicted,x_true,y_true): 
+def calc_delta_r(x_predicted,y_predicted,x_true,y_true):
     """ Compute the scalar distance between predicted halo centers
     and the true halo centers. Predictions are matched to the closest
     halo center.
@@ -37,24 +37,16 @@ def calc_delta_r(x_predicted,y_predicted,x_true,y_true):
     num_halos=len(x_true) #Only works for number of halso > 1
     num_configurations=mt.factorial(num_halos) #The number of possible different comb
     configurations=np.zeros([num_halos,num_configurations],int) #The array of combinations
-                                                                #I will pass back
     distances = np.zeros([num_configurations],float) #THe array of the distances
-                                                     #for all possible combinations
-    
-    radial_distance=[]  #The vector of distances
-                        #I will pass back
-    
     #Pick a combination of true and predicted 
     a=['01','012'] #Input for the permutatiosn, 01 number halos or 012
     count=0 #For the index of the distances array
     true_halo_indexes=[] #The tuples which will show the order of halos picked
     predicted_halo_indexes=[]
     distances_perm=np.zeros([num_configurations,num_halos],float) #The distance between eac
-                                                                  #true and predicted
-                                                                  #halo for every comb
     true_halo_indexes_perm=[] #log of all the permutations of true halos used
     predicted_halo_indexes_perm=[] #log of all the predicted permutations
-    
+
     for  perm in it.permutations(a[num_halos-2],num_halos):
         which_true_halos=[]
         which_predicted_halos=[]
@@ -64,7 +56,7 @@ def calc_delta_r(x_predicted,y_predicted,x_true,y_true):
                                       +(y_true[j]-y_predicted[int(perm[j])])**2)
                                       #This array logs the distance between true and
                                       #predicted halo for ALL configruations
-                                      
+
             which_true_halos.append(j) #logthe order in which I try each true halo
             which_predicted_halos.append(int(perm[j])) #log the order in which I true
                                                        #each predicted halo
@@ -72,19 +64,16 @@ def calc_delta_r(x_predicted,y_predicted,x_true,y_true):
                                                         #all of thifferent config
                                                         #true halo indexes
         predicted_halo_indexes_perm.append(which_predicted_halos)
-        
+
         distances[count]=sum(distances_perm[count,0::]) #Find what the total distances
                                                         #are for each configuration
         count=count+1
 
     config = np.where(distances == min(distances))[0][0] #The configuration used is the one
-                                                         #which has the smallest distance
-    radial_distance.append(distances_perm[config,0::]) #Find the tuple of distances that
-                                                       #correspond to this smallest distance
+    radial_distance = [distances_perm[config,0::]]
     true_halo_indexes=true_halo_indexes_perm[config] #Find the tuple of the index which refers
-                                                     #to the smallest distance
     predicted_halo_indexes=predicted_halo_indexes_perm[config]
-            
+
     return radial_distance,true_halo_indexes,predicted_halo_indexes
 
 
@@ -425,7 +414,7 @@ if __name__ == "__main__":
     user_fname=args.inputfile[0]
     filename = (args.reffile[0]).count('Training_halos.csv')
     if filename == 0:
-        fname=args.reffile[0]+str('Training_halos.csv')
+        fname = f'{args.reffile[0]}Training_halos.csv'
     else:
         fname=args.reffile[0]
 
